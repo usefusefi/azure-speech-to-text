@@ -27,6 +27,7 @@ const startRecordingBtn = document.getElementById('startRecording');
 const stopRecordingBtn = document.getElementById('stopRecording');
 const transcriptionBox = document.getElementById('transcriptionBox');
 const audioSourceSelect = document.getElementById('audioSource');
+const exportSelectedBtn = document.getElementById('exportSelected');
 
 // Load saved settings
 function loadSettings() {
@@ -76,21 +77,38 @@ function initializeSpeechConfig() {
 // Create a new message container
 function createNewMessage(source) {
     const messageDiv = document.createElement('div');
-    messageDiv.className = `message ${source.toLowerCase()}`;
-    
-    const textContent = document.createElement('div');
+    messageDiv.className = `message ${source}`;
+    messageDiv.style.flexDirection = 'column'; // Ensure vertical stacking
+
+    // Add checkbox (except for system messages)
+    if (source !== 'system') {
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.className = 'message-checkbox';
+        messageDiv.appendChild(checkbox);
+    }
+
+    const messageContent = document.createElement('div');
+    messageContent.className = 'message-content';
+
+    const textContent = document.createElement('span');
     textContent.className = 'text-content';
-    
+
+    messageContent.appendChild(textContent);
+    messageDiv.appendChild(messageContent);
+
+    // Timestamp outside the bubble
     const timestamp = document.createElement('div');
     timestamp.className = 'timestamp';
     timestamp.textContent = new Date().toLocaleTimeString();
-    
-    messageDiv.appendChild(textContent);
     messageDiv.appendChild(timestamp);
+
     transcriptionBox.appendChild(messageDiv);
-    
     transcriptionBox.scrollTop = transcriptionBox.scrollHeight;
-    
+
+    // Enable export button if there are messages
+    exportSelectedBtn.disabled = false;
+
     return messageDiv;
 }
 
@@ -531,4 +549,34 @@ document.querySelector('.source-toggle').innerHTML = `
         <i class="fas fa-microphone"></i>
         <span>Auto-detecting audio source...</span>
     </div>
-`; 
+`;
+
+// Add export functionality
+exportSelectedBtn.addEventListener('click', () => {
+    const selectedMessages = Array.from(document.querySelectorAll('.message-checkbox:checked'))
+        .map(checkbox => {
+            const messageDiv = checkbox.closest('.message');
+            const text = messageDiv.querySelector('.text-content').textContent;
+            const timestamp = messageDiv.querySelector('.timestamp').textContent;
+            const source = messageDiv.classList.contains('you') ? 'You' : 'Them';
+            return `[${timestamp}] ${source}: ${text}`;
+        });
+
+    if (selectedMessages.length === 0) {
+        addMessage('Please select at least one message to export.', 'system');
+        return;
+    }
+
+    const exportText = selectedMessages.join('\n');
+    const blob = new Blob([exportText], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `transcription_${new Date().toISOString().slice(0,19).replace(/[:]/g, '-')}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
+    addMessage(`Exported ${selectedMessages.length} messages to text file.`, 'system');
+}); 
