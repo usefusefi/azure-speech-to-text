@@ -22,15 +22,30 @@
                 <button id="saveSettings">Save Settings</button>
             </div>
         </div>
-
+        
         <div class="transcription-container">
             <div id="transcriptionBox" class="transcription-box"></div>
             <div class="controls">
-                <button id="startRecording" class="record-button">Start Recording</button>
-                <button id="stopRecording" class="record-button" disabled>Stop Recording</button>
+                <div class="source-toggle">
+                    <div class="source-indicator">
+                        <i class="fas fa-microphone"></i>
+                        <span>Auto-detecting audio source...</span>
+                    </div>
+                </div>
+                <div class="control-buttons">
+                    <button id="startRecording" class="control-btn">
+                        <i class="fas fa-play"></i>
+                        Start Recording
+                    </button>
+                    <button id="stopRecording" class="control-btn" disabled>
+                        <i class="fas fa-stop"></i>
+                        Stop Recording
+                    </button>
+                </div>
             </div>
         </div>
     </div>
+    
     <script src="https://aka.ms/csspeech/jsbrowserpackageraw"></script>
     <script src="script.js"></script>
 </body>
