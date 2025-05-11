@@ -2,6 +2,8 @@
 
 A modern web application that provides real-time speech-to-text transcription using Azure Speech Services. This application features a clean, intuitive interface with streaming transcription capabilities, making it perfect for real-time speech recognition needs.
 
+![image](https://github.com/user-attachments/assets/7c39a647-b728-4123-8cf7-7017f8773688)
+
 ![Demo](demo.gif)
 
 ## Features
